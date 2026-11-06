@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Catatan Tabungan Obir dan Ifa</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#fdf5f7;--card:#fff;--text:#2a1a20;--muted:#85727a;--line:#f0dfe4;--green:#1f9d63;--red:#d9534f;--accent:#d6336c;--obir:#2f80ed;--ifa:#d6336c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1a1015;--card:#26181f;--text:#f5e8ed;--muted:#b49aa5;--line:#3a2530;--green:#3ecf8e;--red:#ff7a75;--accent:#ff6b9d;--obir:#6aa8ff;--ifa:#ff6b9d}}
+:root[data-theme="dark"]{--bg:#1a1015;--card:#26181f;--text:#f5e8ed;--muted:#b49aa5;--line:#3a2530;--green:#3ecf8e;--red:#ff7a75;--accent:#ff6b9d;--obir:#6aa8ff;--ifa:#ff6b9d}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:640px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:22px;margin:4px 0 2px;text-align:center}
+.sub{color:var(--muted);font-size:13px;margin-bottom:16px;text-align:center}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px}
+.hero{background:linear-gradient(135deg,#2f80ed,#d6336c);color:#fff;border:0}
+.hero small{opacity:.9}
+.saldo{font-size:34px;font-weight:700;margin:4px 0 12px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.stat{flex:1;min-width:120px;background:rgba(255,255,255,.18);border-radius:12px;padding:10px 12px;font-size:13px}
+.stat b{display:block;font-size:15px;margin-top:2px}
+.bar{height:10px;background:rgba(255,255,255,.25);border-radius:99px;overflow:hidden;margin-top:12px}
+.bar i{display:block;height:100%;background:#fff;border-radius:99px;width:0;transition:width .4s}
+label{font-size:12px;color:var(--muted);display:block;margin:10px 0 4px}
+input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--text);font-size:15px}
+.seg{display:flex;gap:8px}
+.seg button{flex:1;padding:11px;border:1px solid var(--line);background:var(--bg);color:var(--text);border-radius:10px;font-size:14px;cursor:pointer}
+#pObir.on{background:var(--obir);color:#fff;border-color:var(--obir)}
+#pIfa.on{background:var(--ifa);color:#fff;border-color:var(--ifa)}
+#bIn.on{background:var(--green);color:#fff;border-color:var(--green)}
+#bOut.on{background:var(--red);color:#fff;border-color:var(--red)}
+.btn{width:100%;margin-top:14px;padding:13px;border:0;border-radius:10px;background:var(--accent);color:#fff;font-size:15px;font-weight:600;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--line);margin-top:8px;padding:9px;font-size:13px}
+.item{display:flex;align-items:center;gap:10px;padding:12px 0;border-top:1px solid var(--line)}
+.item:first-child{border-top:0}
+.item .t{flex:1;min-width:0}
+.item .t div:first-child{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item .t div:last-child{font-size:12px;color:var(--muted)}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:99px;color:#fff;margin-right:6px}
+.tag.Obir{background:var(--obir)}.tag.Ifa{background:var(--ifa)}
+.amt{font-weight:700;font-size:14px;white-space:nowrap}
+.in-c{color:var(--green)}.out-c{color:var(--red)}
+.del{background:none;border:0;color:var(--muted);font-size:18px;cursor:pointer;padding:4px 8px}
+.empty{color:var(--muted);text-align:center;padding:18px 0;font-size:14px}
+h2{font-size:15px;margin:0 0 6px}
+.who{display:flex;gap:10px}
+.who div{flex:1;border-radius:12px;padding:10px 12px;font-size:13px;color:#fff}
+.who b{display:block;font-size:15px;margin-top:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>💕 Catatan Tabungan Obir dan Ifa</h1>
+  <div class="sub" id="status">Memuat data…</div>
+
+  <div class="card hero">
+    <small>Total Saldo Tabungan Bersama</small>
+    <div class="saldo" id="saldo">Rp 0</div>
+    <div class="row">
+      <div class="stat">Total Setor<b id="sIn">Rp 0</b></div>
+      <div class="stat">Total Tarik<b id="sOut">Rp 0</b></div>
+    </div>
+    <div class="bar"><i id="prog"></i></div>
+    <small id="progTxt" style="display:block;margin-top:6px"></small>
+  </div>
+
+  <div class="card">
+    <h2>Kontribusi Masing-masing</h2>
+    <div class="who">
+      <div style="background:var(--obir)">Obir<b id="tObir">Rp 0</b></div>
+      <div style="background:var(--ifa)">Ifa<b id="tIfa">Rp 0</b></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 id="formTitle">Tambah Catatan</h2>
+    <label>Siapa yang menabung?</label>
+    <div class="seg">
+      <button id="pObir" class="on" type="button">👦 Obir</button>
+      <button id="pIfa" type="button">👧 Ifa</button>
+    </div>
+    <label>Jenis</label>
+    <div class="seg">
+      <button id="bIn" class="on" type="button">＋ Setor</button>
+      <button id="bOut" type="button">－ Tarik</button>
+    </div>
+    <label>Jumlah (Rp)</label>
+    <input id="amount" inputmode="numeric" placeholder="contoh: 50000">
+    <label>Catatan</label>
+    <input id="note" placeholder="contoh: Buat liburan bareng">
+    <label>Tanggal</label>
+    <input id="date" type="date">
+    <button class="btn" id="save" type="button">Simpan</button>
+    <button class="btn ghost" id="cancelEdit" type="button" style="display:none">Batal Edit</button>
+  </div>
+
+  <div class="card">
+    <h2>Target Tabungan Bersama</h2>
+    <input id="target" inputmode="numeric" placeholder="contoh: 10000000">
+    <button class="btn ghost" id="setTarget" type="button">Atur Target</button>
+  </div>
+
+  <div class="card">
+    <h2>Cadangan Data (Backup)</h2>
+    <div class="sub" style="text-align:left;margin:0 0 8px">Data tersimpan di browser ini. Simpan cadangan secara berkala, atau kirim file cadangan ke Ifa supaya datanya sama.</div>
+    <button class="btn ghost" id="exp" type="button">⬇️ Unduh Cadangan</button>
+    <button class="btn ghost" id="imp" type="button">⬆️ Pulihkan dari Cadangan</button>
+    <input type="file" id="file" accept=".json,application/json" style="display:none">
+  </div>
+
+  <div class="card">
+    <h2>Riwayat</h2>
+    <div id="list"><div class="empty">Memuat…</div></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var KEY="catatan-tabungan-obir-ifa-v1";
+  var $=function(i){return document.getElementById(i)};
+  var rp=function(n){return "Rp "+Math.round(n).toLocaleString("id-ID")};
+  var num=function(s){return parseInt(String(s).replace(/\D/g,""),10)||0};
+  var today=function(){return new Date().toISOString().slice(0,10)};
+  var who="Obir",type="in",editId=null,state={tx:[],target:0},okStore=true;
+
+  function load(){
+    try{var r=localStorage.getItem(KEY);if(r){var d=JSON.parse(r);if(d&&Array.isArray(d.tx))state={tx:d.tx,target:d.target||0}}}
+    catch(e){okStore=false}
+  }
+  function save(){
+    try{localStorage.setItem(KEY,JSON.stringify(state));okStore=true}catch(e){okStore=false}
+    $("status").textContent=okStore?"✅ Data tersimpan otomatis di browser ini":"⚠️ Gagal menyimpan. Pastikan browser mengizinkan penyimpanan.";
+    render();
+  }
+  try{var w=localStorage.getItem("tab-who");if(w==="Ifa"||w==="Obir")who=w}catch(e){}
+
+  function pick(){
+    $("pObir").className=who==="Obir"?"on":"";$("pIfa").className=who==="Ifa"?"on":"";
+    $("bIn").className=type==="in"?"on":"";$("bOut").className=type==="out"?"on":"";
+  }
+  $("pObir").onclick=function(){who="Obir";try{localStorage.setItem("tab-who",who)}catch(e){}pick()};
+  $("pIfa").onclick=function(){who="Ifa";try{localStorage.setItem("tab-who",who)}catch(e){}pick()};
+  $("bIn").onclick=function(){type="in";pick()};
+  $("bOut").onclick=function(){type="out";pick()};
+  $("amount").oninput=function(){var n=num(this.value);this.value=n?n.toLocaleString("id-ID"):""};
+  $("target").oninput=$("amount").oninput;
+
+  function render(){
+    var tx=state.tx,target=state.target,i=0,o=0,p={Obir:0,Ifa:0};
+    tx.forEach(function(t){t.type==="in"?i+=t.amount:o+=t.amount;if(p[t.who]!==undefined)p[t.who]+=(t.type==="in"?t.amount:-t.amount)});
+    var s=i-o;
+    $("saldo").textContent=rp(s);$("sIn").textContent=rp(i);$("sOut").textContent=rp(o);
+    $("tObir").textContent=rp(p.Obir);$("tIfa").textContent=rp(p.Ifa);
+    if(target>0){
+      var pc=Math.max(0,Math.min(100,s/target*100));
+      $("prog").style.width=pc+"%";
+      $("progTxt").textContent=Math.round(pc)+"% dari target "+rp(target)+(s<target?" • kurang "+rp(target-s):" • 🎉 Target tercapai!");
+    }else{$("prog").style.width="0";$("progTxt").textContent="Belum ada target. Atur di bawah."}
+    var l=$("list");l.innerHTML="";
+    if(!tx.length){l.innerHTML='<div class="empty">Belum ada catatan. Mulai menabung bareng yuk!</div>';return}
+    tx.slice().sort(function(a,b){return (b.date||"").localeCompare(a.date||"")||(b.id-a.id)}).forEach(function(t){
+      var d=document.createElement("div");d.className="item";
+      var tt=document.createElement("div");tt.className="t";
+      var a=document.createElement("div");
+      var tg=document.createElement("span");tg.className="tag "+t.who;tg.textContent=t.who;
+      a.appendChild(tg);a.appendChild(document.createTextNode(t.note||(t.type==="in"?"Setor":"Tarik")));
+      var b=document.createElement("div");b.textContent=t.date;
+      tt.appendChild(a);tt.appendChild(b);
+      var m=document.createElement("div");m.className="amt "+(t.type==="in"?"in-c":"out-c");
+      m.textContent=(t.type==="in"?"+ ":"− ")+rp(t.amount);
+      var e=document.createElement("button");e.className="del";e.textContent="✏️";e.title="Edit";e.onclick=function(){startEdit(t)};
+      var x=document.createElement("button");x.className="del";x.textContent="✕";x.title="Hapus";
+      x.onclick=function(){
+        if(!confirm("Hapus catatan ini?"))return;
+        state.tx=state.tx.filter(function(z){return z.id!==t.id});
+        if(editId===t.id)resetForm();
+        save();
+      };
+      d.appendChild(tt);d.appendChild(m);d.appendChild(e);d.appendChild(x);l.appendChild(d);
+    });
+  }
+
+  function startEdit(t){
+    editId=t.id;who=t.who;type=t.type;
+    $("amount").value=t.amount.toLocaleString("id-ID");
+    $("note").value=t.note||"";$("date").value=t.date||today();
+    $("save").textContent="Perbarui Catatan";$("cancelEdit").style.display="block";
+    $("formTitle").textContent="Edit Catatan";pick();
+    $("formTitle").scrollIntoView({behavior:"smooth"});
+  }
+  function resetForm(){
+    editId=null;$("amount").value="";$("note").value="";$("date").value=today();
+    $("save").textContent="Simpan";$("cancelEdit").style.display="none";
+    $("formTitle").textContent="Tambah Catatan";
+  }
+  $("cancelEdit").onclick=resetForm;
+
+  $("save").onclick=function(){
+    var a=num($("amount").value);
+    if(!a){alert("Masukkan jumlah dulu ya.");return}
+    var data={who:who,type:type,amount:a,note:$("note").value.trim(),date:$("date").value||today()};
+    if(editId!==null){
+      state.tx=state.tx.map(function(t){return t.id===editId?Object.assign({},t,data):t});
+    }else{
+      data.id=Date.now();state.tx.push(data);
+    }
+    resetForm();save();
+  };
+  $("setTarget").onclick=function(){state.target=num($("target").value);save()};
+
+  // Backup
+  $("exp").onclick=function(){
+    var blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+    var a=document.createElement("a");a.href=URL.createObjectURL(blob);
+    a.download="cadangan-tabungan-"+today()+".json";document.body.appendChild(a);a.click();a.remove();
+  };
+  $("imp").onclick=function(){$("file").click()};
+  $("file").onchange=function(){
+    var f=this.files[0];if(!f)return;
+    var r=new FileReader();
+    r.onload=function(){
+      try{
+        var d=JSON.parse(r.result);
+        if(!d||!Array.isArray(d.tx))throw 0;
+        if(!confirm("Ganti semua data sekarang dengan data dari cadangan ini?"))return;
+        state={tx:d.tx,target:d.target||0};
+        $("target").value=state.target?state.target.toLocaleString("id-ID"):"";
+        save();
+      }catch(e){alert("File cadangan tidak valid.")}
+    };
+    r.readAsText(f);this.value="";
+  };
+
+  load();
+  $("date").value=today();
+  $("target").value=state.target?state.target.toLocaleString("id-ID"):"";
+  pick();
+  $("status").textContent=okStore?"✅ Data tersimpan otomatis di browser ini":"⚠️ Penyimpanan browser tidak tersedia";
+  render();
+})();
+</script>
+</body>
+</html>
